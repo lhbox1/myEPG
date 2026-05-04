@@ -55,14 +55,3 @@ jobs:
             git push origin master
           fi
 
-      - name: Mirror GitHub to Gitee
-        uses: Yikun/hub-mirror-action@master
-        with:
-          src: 'github/lhbox1/myEPG'
-          dst: 'gitee/mytv-android'
-          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
-          dst_token:  ${{ secrets.GITEE_TOKEN }}
-          force_update: true
-          static_list: "myEPG"
-          account_type: org
-          debug: true
