@@ -1,7 +1,7 @@
 #epg链接，一行一个
-https://raw.githubusercontent.com/mytv-android/SCTV_EPG/refs/heads/main/epg.xml
+#https://raw.githubusercontent.com/mytv-android/SCTV_EPG/refs/heads/main/epg.xml
 https://epg.27481716.xyz/epg.xml
 https://epg.mb6.top/heiptv.xml
-https://raw.githubusercontent.com/kuke31/xmlgz/main/all.xml.gz
+#https://raw.githubusercontent.com/kuke31/xmlgz/main/all.xml.gz
 https://epg.zsdc.eu.org/t.xml
-https://e.erw.cc/all.xml.gz
+#https://e.erw.cc/all.xml.gz
