@@ -56,15 +56,25 @@ jobs:
             git push origin master
           fi
 
-  # 替换为更稳定的清理插件
+  # 使用官方 GitHub CLI 原生脚本清理，再也不怕插件挂掉
   cleanup:
     runs-on: ubuntu-latest
-    needs: push # 在 push 任务成功完成后执行
+    needs: push
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Delete old workflow runs
-        uses: Alistair23/the-delete-workflow-runs@v2.3.1
-        with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          retain_days: 0             # 不按天数筛选
-          keep_minimum_runs: 3       # 严格保留最近的 3 个记录
+      - name: Clear old workflow runs natively
+        run: |
+          echo "Fetching workflow runs..."
+          # 获取当前工作流的所有运行 ID，按时间从新到旧排序，跳过前 3 个（保留），其余的全部删除
+          RUN_IDS=$(gh run list --workflow "${{ github.workflow }}" --json databaseId --jq '.[].databaseId' | tail -n +4)
+          
+          if [ -z "$RUN_IDS" ]; then
+            echo "No old runs to delete."
+          else
+            for RUN_ID in $RUN_IDS; do
+              echo "Deleting run ID: $RUN_ID"
+              gh run delete "$RUN_ID"
+            done
+            echo "Cleanup completed."
+          fi
