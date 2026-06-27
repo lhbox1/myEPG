@@ -3,14 +3,14 @@ name: 'Update schedule'
 permissions:
   contents: write
 
-on:
+于:
   schedule:
-    - cron: '22 3,19 * * *'
+    - cron: '22 3 */3 * *'
   workflow_dispatch:
-    branches:
+    分支:
       - master
   push:
-    branches:
+    分支:
       - master
 
 jobs:
