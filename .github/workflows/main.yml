@@ -1,8 +1,8 @@
 name: 'Update schedule'
-# 关键：授予写入权限（注意：清理运行记录需要 actions: write 权限）
+# 关键：授予写入权限
 permissions:
   contents: write
-  actions: write
+  actions: write # 清理运行记录必须
 
 on:
   schedule:
@@ -56,15 +56,15 @@ jobs:
             git push origin master
           fi
 
-  # 新增：自动清理运行记录的任务
+  # 替换为更稳定的清理插件
   cleanup:
     runs-on: ubuntu-latest
     needs: push # 在 push 任务成功完成后执行
     steps:
       - name: Delete old workflow runs
-        uses: supertux8/delete-workflow-runs@v2
+        uses: Alistair23/the-delete-workflow-runs@v2.3.1
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
-          retain_days: 0          # 不按天数保留
-          keep_minimum_runs: 3   # 严格保留最近的 3 个记录
+          retain_days: 0             # 不按天数筛选
+          keep_minimum_runs: 3       # 严格保留最近的 3 个记录
