@@ -2,7 +2,7 @@ name: 'Update schedule'
 # 关键：授予写入权限
 permissions:
   contents: write
-  actions: write # 清理运行记录必须
+  actions: write # 清理运行记录必须的权限
 
 on:
   schedule:
@@ -56,18 +56,14 @@ jobs:
             git push origin master
           fi
 
-  # 使用官方 GitHub CLI 原生脚本清理，再也不怕插件挂掉
-  cleanup:
-    runs-on: ubuntu-latest
-    needs: push
-    env:
-      GH_TOKEN: ${{ github.token }}
-    steps:
+      # 🟢 方法二：直接在当前 Job 的最后一步执行清理
       - name: Clear old workflow runs natively
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          echo "Fetching workflow runs..."
-          # 获取当前工作流的所有运行 ID，按时间从新到旧排序，跳过前 3 个（保留），其余的全部删除
-          RUN_IDS=$(gh run list --workflow "${{ github.workflow }}" --json databaseId --jq '.[].databaseId' | tail -n +4)
+          echo "Fetching completed workflow runs..."
+          # 获取已完成的任务，扩大单次查询量至 500，跳过最新的 3 个记录
+          RUN_IDS=$(gh run list --workflow "${{ github.workflow }}" --status completed --limit 500 --json databaseId --jq '.[].databaseId' | tail -n +4)
           
           if [ -z "$RUN_IDS" ]; then
             echo "No old runs to delete."
@@ -75,6 +71,7 @@ jobs:
             for RUN_ID in $RUN_IDS; do
               echo "Deleting run ID: $RUN_ID"
               gh run delete "$RUN_ID"
+              sleep 0.5 # 延迟 0.5 秒，防止触发 GitHub API 限流
             done
             echo "Cleanup completed."
           fi
